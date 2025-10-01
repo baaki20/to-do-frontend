@@ -1,18 +1,13 @@
 // --- 1. CONFIGURATION: Use Environment Variables ---
 
+// Amplify Hosting injects environment variables prefixed with REACT_APP_
+// These must be defined first, before Amplify.configure() is called.
+
 // Read variables from the environment (Amplify build process)
 const USER_POOL_ID = process.env.REACT_APP_USER_POOL_ID; 
 const CLIENT_ID = process.env.REACT_APP_USER_POOL_CLIENT_ID;
 const API_URL = process.env.REACT_APP_API_URL;
-const REGION = 'eu-north-1'; // Your deployed region
-
-// Check for required configuration variables
-if (!USER_POOL_ID || !CLIENT_ID || !API_URL) {
-    console.error("Amplify configuration variables are missing. App cannot initialize.");
-    // Fail gracefully on the frontend if config is missing
-    document.getElementById('signup-message').textContent = "Configuration Error: Check Amplify environment variables.";
-    document.getElementById('signin-message').textContent = "Configuration Error: Check Amplify environment variables.";
-}
+const REGION = 'eu-north-1'; // Ensure this matches your deployment region
 
 // Configure Amplify
 Amplify.configure({
@@ -30,8 +25,7 @@ Amplify.configure({
                 // Function to retrieve the JWT for every authenticated API request
                 custom_header: async () => {
                     try {
-                        // CRITICAL FIX: Reference Auth directly via Amplify object 
-                        // to ensure it's initialized before the top-level destructuring occurs.
+                        // The Auth object is now guaranteed to be available
                         const session = await Amplify.Auth.currentSession();
                         return { 
                             Authorization: session.getIdToken().getJwtToken() 
@@ -62,7 +56,7 @@ async function signUp() {
             password,
             attributes: { email } 
         });
-        messageEl.textContent = "Sign Up Success! User created. Please sign in.";
+        messageEl.textContent = "Sign Up Success! User created. Sign In now.";
         messageEl.style.color = 'green';
     } catch (error) {
         messageEl.textContent = `Error signing up: ${error.message}`;
