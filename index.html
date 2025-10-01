@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serverless To-Do App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="auth-section">
+        <h2>Authentication</h2>
+        
+        <div class="auth-box">
+            <h3>Sign Up</h3>
+            <input type="email" id="signup-email" placeholder="Email" required>
+            <input type="password" id="signup-password" placeholder="Password" required>
+            <button onclick="signUp()">Sign Up</button>
+            <p id="signup-message" class="message"></p>
+        </div>
+
+        <div class="auth-box">
+            <h3>Sign In</h3>
+            <input type="email" id="signin-email" placeholder="Email" required>
+            <input type="password" id="signin-password" placeholder="Password" required>
+            <button onclick="signIn()">Sign In</button>
+            <button onclick="signOut()">Sign Out</button>
+            <p id="signin-message" class="message"></p>
+        </div>
+    </div>
+
+    <div id="app-section" style="display:none;">
+        <h2>Task Management</h2>
+        
+        <div class="task-form">
+            <h3>Create New Task (Deadline: 5 min)</h3>
+            <input type="text" id="task-description" placeholder="Task Description" required>
+            <button onclick="createTask()">Add Task</button>
+        </div>
+        
+        <h3>Your Tasks</h3>
+        <div id="task-list">
+            </div>
+    </div>
+
+    <script src="node_modules/aws-amplify/dist/aws-amplify.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

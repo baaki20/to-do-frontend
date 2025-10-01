@@ -1,0 +1,8 @@
+# Ignore the contents of node_modules
+node_modules/*
+
+# But do NOT ignore the aws-amplify package
+!node_modules/aws-amplify/
+
+# Ignore environment-specific configuration
+.env
