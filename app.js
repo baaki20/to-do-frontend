@@ -1,10 +1,25 @@
-import { Amplify } from 'aws-amplify';
+// --- 1. CONFIGURATION: Use Environment Variables ---
 
+// Read variables from the environment (Amplify build process)
+const USER_POOL_ID = process.env.REACT_APP_USER_POOL_ID; 
+const CLIENT_ID = process.env.REACT_APP_USER_POOL_CLIENT_ID;
+const API_URL = process.env.REACT_APP_API_URL;
+const REGION = 'eu-north-1'; // Your deployed region
+
+// Check for required configuration variables
+if (!USER_POOL_ID || !CLIENT_ID || !API_URL) {
+    console.error("Amplify configuration variables are missing. App cannot initialize.");
+    // Fail gracefully on the frontend if config is missing
+    document.getElementById('signup-message').textContent = "Configuration Error: Check Amplify environment variables.";
+    document.getElementById('signin-message').textContent = "Configuration Error: Check Amplify environment variables.";
+}
+
+// Configure Amplify
 Amplify.configure({
     Auth: {
-        userPoolId: process.env.USER_POOL_ID,
-        userPoolWebClientId: process.env.USER_POOL_CLIENT_ID,
-        region: 'eu-north-1'
+        userPoolId: USER_POOL_ID,
+        userPoolWebClientId: CLIENT_ID,
+        region: REGION
     },
     API: {
         endpoints: [
@@ -12,14 +27,17 @@ Amplify.configure({
                 name: "TodoAppApi",
                 endpoint: API_URL,
                 region: REGION,
+                // Function to retrieve the JWT for every authenticated API request
                 custom_header: async () => {
                     try {
-                        const session = await Auth.currentSession();
+                        // CRITICAL FIX: Reference Auth directly via Amplify object 
+                        // to ensure it's initialized before the top-level destructuring occurs.
+                        const session = await Amplify.Auth.currentSession();
                         return { 
                             Authorization: session.getIdToken().getJwtToken() 
                         };
                     } catch (e) {
-                        console.error("No current user session:", e);
+                        // If session fails, it means the user is not signed in
                         return {};
                     }
                 }
@@ -28,6 +46,7 @@ Amplify.configure({
     }
 });
 
+// Destructure Amplify services *after* configuration
 const { Auth, API } = Amplify;
 
 // --- 2. AUTHENTICATION FUNCTIONS ---
@@ -43,10 +62,7 @@ async function signUp() {
             password,
             attributes: { email } 
         });
-        // Note: Cognito sends a verification email, but your UserPool is set 
-        // to AutoVerifiedAttributes, so this might not be necessary, 
-        // but it's good practice for production.
-        messageEl.textContent = "Sign Up Success! User created. Sign In now.";
+        messageEl.textContent = "Sign Up Success! User created. Please sign in.";
         messageEl.style.color = 'green';
     } catch (error) {
         messageEl.textContent = `Error signing up: ${error.message}`;
