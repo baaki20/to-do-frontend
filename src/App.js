@@ -3,7 +3,6 @@ import { Amplify } from 'aws-amplify';
 import { signUp, signIn, signOut, getCurrentUser, confirmSignUp, fetchAuthSession } from 'aws-amplify/auth';
 import './App.css';
 
-// Configure Amplify with your backend outputs
 Amplify.configure({
   Auth: {
     Cognito: {
